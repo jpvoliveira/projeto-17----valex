@@ -7,14 +7,14 @@ import * as rechargeRepository from "../repositories/rechargeRepository.js"
 export async function purchases(cardId: number, password: string, businessId: number, amount: number) {
   const cardExisting = await cardRepository.findById(cardId)
   if (!cardExisting)
-    throw { type: "Conflict", message: "Card does not exist" };
+    throw { type: "Not Found", message: "Card does not exist" };
 
   if (cardExisting.password !== password)
-    throw { type: "Conflict", message: "Incorrect password" };
+    throw { type: "Unprocessable Entity", message: "Incorrect password" };
 
   const businessExisting = await businessRepository.findById(businessId)
   if (!businessExisting)
-    throw { type: "Conflict", message: "The business does not exist" }
+    throw { type: "Not Found", message: "The business does not exist" }
 
   if (businessExisting.type !== cardExisting.type)
     throw { type: "Conflict", message: "The type of business is different from the type of card" }

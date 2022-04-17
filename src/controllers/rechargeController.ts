@@ -8,7 +8,7 @@ export async function rechargeCard(req: Request, res: Response) {
 
   const company = await companyRepository.findByApiKey(apiKey);
   if (!company)
-    throw { type: "Conflict", message: "The key is from no company" };
+    throw { type: "Unauthorized", message: "The key is from no company" };
 
   if (amount <= 0) 
     throw {type: "Conflict", message:"The value must be greater than 0"}

@@ -13,18 +13,18 @@ export async function validateCardService(
 ) {
   const company = await companyRepository.findByApiKey(apiKey);
   if (!company)
-    throw { type: "Conflict", message: "The key is from no company" };
+    throw { type: "Not Found", message: "This key does not exist" };
 
   const employee = await employeeRepository.findById(employeeId);
   if (!employee)
-    throw { type: "Conflict", message: "This employee does not exist" };
+    throw { type: "Not Found", message: "This employee does not exist" };
 
   const typeCard = await cardRepository.findByTypeAndEmployeeId(type, employeeId)
   if (typeCard)
     throw { type: "Conflict", message: "The employee already has a card of this type" };
 
   if (type !== 'groceries' && type !== 'restaurants' && type !== 'transport' && type !== 'education' && type !== 'health')
-    throw { type: "Conflict", message: "This type of card does not exist" };
+    throw { type: "Not Found", message: "This type of card does not exist" };
 
   const flagNumber = faker.datatype.number({ min: 51, max: 55 })
   const finishNumber = faker.datatype.number({ min: 10000000000000, max: 99999999999999 })
@@ -67,7 +67,7 @@ export async function validateCardService(
 export async function cardActive(cardId: number, cvc: string, password: string) {
   const existingCard = await cardRepository.findById(cardId)
   if (!existingCard)
-    throw { type: "Conflict", message: "Card does not exist" };
+    throw { type: "Not Found", message: "Card does not exist" };
 
   if (existingCard.securityCode !== cvc)
     throw { type: "Conflict", message: "Card data does not match" };
@@ -76,7 +76,7 @@ export async function cardActive(cardId: number, cvc: string, password: string) 
     throw { type: "Conflict", message: "Card already active" };
 
   if (password.length !== 4)
-    throw { type: "Conflict", message: "Password must be 4 digits" };
+    throw { type: "Unprocessable Entity", message: "Password must be 4 digits" };
 
   existingCard.password = password
   await cardRepository.update(cardId, existingCard)
@@ -85,7 +85,7 @@ export async function cardActive(cardId: number, cvc: string, password: string) 
 export async function cardView(cardId: number) {
   const existingCard = await cardRepository.findById(cardId)
   if (!existingCard)
-    throw { type: "Conflict", message: "Card does not exist" };
+    throw { type: "Not Found", message: "Card does not exist" };
 
   const paymentData = await paymentRepository.findByCardId(cardId)
   let contPayment = 0
@@ -104,7 +104,7 @@ export async function cardView(cardId: number) {
       contRecharge = element.amount + contRecharge
     }
   }
-  
+
   let balance = contRecharge - contPayment
   const cardViewData = { balance, transactions: paymentData, recharge: rechargeData }
   return cardViewData
