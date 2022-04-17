@@ -109,3 +109,35 @@ export async function cardView(cardId: number) {
   const cardViewData = { balance, transactions: paymentData, recharge: rechargeData }
   return cardViewData
 }
+
+export async function cardBlock(cardId: number, password: string) {
+  const existingCard = await cardRepository.findById(cardId)
+  if (!existingCard)
+    throw { type: "Not Found", message: "Card does not exist" };
+
+  if (existingCard.password !== password)
+    throw { type: "Unprocessable Entity", message: "Incorrect password" };
+
+  if (existingCard.isBlocked === true)
+    throw { type: "Conflict", message: "This card already blocked" };
+
+  existingCard.isBlocked = true
+
+  await cardRepository.update(cardId, existingCard)
+}
+
+export async function cardUnlock(cardId: number, password: string) {
+  const existingCard = await cardRepository.findById(cardId)
+  if (!existingCard)
+    throw { type: "Not Found", message: "Card does not exist" };
+
+  if (existingCard.password !== password)
+    throw { type: "Unprocessable Entity", message: "Incorrect password" };
+
+  if (existingCard.isBlocked === false)
+    throw { type: "Conflict", message: "This card already unlocked" };
+
+  existingCard.isBlocked = false
+
+  await cardRepository.update(cardId, existingCard)
+}

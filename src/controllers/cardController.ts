@@ -28,3 +28,15 @@ export async function cardView(req:Request, res:Response) {
   const cardView = await cardService.cardView(cardId)
   res.send(cardView)
 }
+
+export async function cardBlock(req:Request, res:Response) {
+  const {cardId, password} = req.body
+  await cardService.cardBlock(cardId, password)
+  res.sendStatus(201)
+}
+
+export async function cardUnlock(req:Request, res:Response) {
+  const {cardId, password} = req.body
+  await cardService.cardUnlock(cardId, password)
+  res.sendStatus(201)
+}

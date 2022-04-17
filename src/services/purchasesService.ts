@@ -12,6 +12,9 @@ export async function purchases(cardId: number, password: string, businessId: nu
   if (cardExisting.password !== password)
     throw { type: "Unprocessable Entity", message: "Incorrect password" };
 
+  if (cardExisting.isBlocked === true)
+    throw { type: "Conflict", message: "This card is blocked" };
+
   const businessExisting = await businessRepository.findById(businessId)
   if (!businessExisting)
     throw { type: "Not Found", message: "The business does not exist" }
